@@ -11,7 +11,6 @@ import android.os.Handler;
 import com.umutkina.findunfollowersapp.R;
 import com.umutkina.findunfollowersapp.UnfApplication;
 import com.umutkina.findunfollowersapp.modals.Const;
-import com.umutkina.findunfollowersapp.modals.HashTagListWraper;
 import com.umutkina.findunfollowersapp.modals.TweetItem;
 import com.umutkina.findunfollowersapp.modals.TweetList;
 import com.umutkina.findunfollowersapp.modals.TweetListWrapper;
@@ -44,14 +43,23 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     int woeId = 23424969;
     Context context;
     ArrayList<YdsWord> ydsWords;
-    HashTagListWraper hashTagListWraper;
+    Random random;
+//    HashTagListWraper hashTagListWraper;
     //    int sabahattinaliId=752817655;
 //    long sabahattinaliId = 2227028862L;
 
     //    long getSabahattinaliId=2190585744L;
 //    long oguzAtayId = 549338736;
-    long nazimHikmetId=1345040852;
+//    long nazimHikmetId = 1345040852;
+//    long kitaplardan = 2195318344L;
+
+//    long sarki=2195318344L;
 //    long sabahattinaliId = 2226509852<;
+
+    //kelime deryası,gafebesi,gogeBAKALIM ,SiirSokaktaaa,Sabahattin_Ali_,siirsokakta,AtayOguz_,N_Hikmet_Ran
+
+    long accounts[] = {3121168263L,130494271L,2190585744L,2227028862L,752817655,1728743684,549338736,1345040852};
+    SharedPreferences sharedPreferences;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -64,14 +72,12 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
         final UnfApplication application = (UnfApplication) context.getApplicationContext();
         twitters = application.getTwitters();
-        SharedPreferences sharedPreferences = application.getmSharedPreferences();
-        String string = sharedPreferences.getString(Const.TWEET_LIST, null);
-        TweetListWrapper tweetListWrapper = (TweetListWrapper) Utils.getObject(string, TweetListWrapper.class);
-            Resources res = context.getResources();
+        sharedPreferences = application.getmSharedPreferences();
+        Resources res = context.getResources();
 
         String hashTagJson = sharedPreferences.getString(Const.HASH_TAG_LIST, null);
 
-        hashTagListWraper = (HashTagListWraper) Utils.getObject(string, HashTagListWraper.class);
+//        hashTagListWraper = (HashTagListWraper) Utils.getObject(string, HashTagListWraper.class);
 
 //        if (hashTagListWraper != null) {
 //            Resources res = context.getResources();
@@ -89,7 +95,8 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 //////
         String[] planets = res.getStringArray(R.array.hashtag_list_T_uyar);
-        Random random = new Random();
+
+        random = new Random();
 ////
         // turguy uyar account
 
@@ -99,32 +106,25 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         Query currentQuery = new Query(planets[k]);
         search(currentQuery);
 
-        if (tweetListWrapper != null) {
 
-            Calendar cal = Calendar.getInstance();
-            int hourofday = cal.get(Calendar.HOUR_OF_DAY);
+
+        Calendar cal = Calendar.getInstance();
+        int hourofday = cal.get(Calendar.HOUR_OF_DAY);
 
 // burak burada saat kontrolü var 1 ile 9 arasında atmaması için retun diyorum
-            if (hourofday < 9 && hourofday > 1) {
-                return;
-            }
-            String name = sharedPreferences.getString(Const.SELECTED_TWEET_NAME, null);
-            ArrayList<TweetList> tweetLists = tweetListWrapper.getTweetLists();
-            TweetList currentTwetList = null;
-            for (TweetList tweetList : tweetLists) {
-                if (tweetList.getName().equalsIgnoreCase(name)) {
-                    currentTwetList = tweetList;
-                    break;
-                }
-            }
-//            Random random = new Random();
-            ArrayList<TweetItem> tweetItems = currentTwetList.getTweetItems();
-            int randonSentence = random.nextInt(tweetItems.size());
-            new MentionReq().execute(tweetItems.get(randonSentence).getTweet());
-
+        if (hourofday < 8 && hourofday > 2) {
+            return;
         }
 
-        new GetFollowersTask().execute(nazimHikmetId);
+//            Random random = new Random();
+
+        new MentionReq().execute();
+
+
+
+        int length = accounts.length;
+        int i = random.nextInt(length);
+        new GetFollowersTask().execute(accounts[i]);
 
         //burak bu kısım string.xml den çekmek için
 
@@ -222,7 +222,27 @@ public class TweetServiceReceiver extends BroadcastReceiver {
             try {
 
                 for (Twitter twitter : twitters) {
-                    twitter.updateStatus(args[0]);
+                    String string = sharedPreferences.getString(Const.TWEET_LIST, null);
+
+                    TweetListWrapper tweetListWrapper = (TweetListWrapper) Utils.getObject(string, TweetListWrapper.class);
+                    if (tweetListWrapper==null) {
+                        return null;
+                    }
+                    String name = sharedPreferences.getString(Const.SELECTED_TWEET_NAME, null);
+                    ArrayList<TweetList> tweetLists = tweetListWrapper.getTweetLists();
+                    TweetList currentTwetList = null;
+                    for (TweetList tweetList : tweetLists) {
+                        if (tweetList.getName().equalsIgnoreCase(name)) {
+                            currentTwetList = tweetList;
+                            break;
+                        }
+                    }
+
+
+                    ArrayList<TweetItem> tweetItems = currentTwetList.getTweetItems();
+                    int randonSentence = random.nextInt(tweetItems.size());
+                    String tweet = tweetItems.get(randonSentence).getTweet();
+                    twitter.updateStatus(tweet);
                     Thread.sleep(1000);
                 }
 
@@ -444,8 +464,11 @@ public class TweetServiceReceiver extends BroadcastReceiver {
                     @Override
                     public void run() {
 
+                        // tweet follow kısmı
                         new RequestTask().execute(l.getId());
-//                        new RequestTaskFollow().execute(user.getId());
+
+                        // tweeti atan kişiyi takip ediyor.
+                        new RequestTaskFollow().execute(user.getId());
 
                     }
                 }, i);
