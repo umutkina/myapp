@@ -118,7 +118,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 //            Random random = new Random();
 
-        new MentionReq().execute();
+//        new MentionReq().execute();
 
 
 
@@ -174,7 +174,59 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
 
-                new MentionReq().execute(shareBody);
+                new MentionReqForIngApp().execute(shareBody);
+
+    }
+
+
+    class MentionReqForIngApp extends AsyncTask<String, String, String> {
+
+        /**
+         * Before starting background thread Show Progress Dialog
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        /**
+         * getting Places JSON
+         */
+        protected String doInBackground(String... args) {
+
+            String user = "";
+            try {
+
+                for (Twitter twitter : twitters) {
+
+
+                    twitter.updateStatus(args[0]);
+                    Thread.sleep(1000);
+                }
+
+
+            } catch (TwitterException e) {
+                e.printStackTrace();
+                user = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return user;
+        }
+
+        /**
+         * After completing background task Dismiss the progress dialog and show
+         * the data in UI Always use runOnUiThread(new Runnable()) to update UI
+         * from background thread, otherwise you will get error
+         * *
+         */
+        protected void onPostExecute(String user) {
+            // dismiss the dialog after getting all products
+
+
+            // updating UI from Background Thread
+        }
 
     }
 
