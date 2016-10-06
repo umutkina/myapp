@@ -56,9 +56,9 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 //    long sarki=2195318344L;
 //    long sabahattinaliId = 2226509852<;
 
-    //kelime deryası,gafebesi,gogeBAKALIM ,SiirSokaktaaa,Sabahattin_Ali_,siirsokakta,AtayOguz_,N_Hikmet_Ran
+    //OSYMbaskanligi,remzihoca,seyfihoca ,kelimeogren,tureng,siirsokakta,AtayOguz_,N_Hikmet_Ran
 
-    long accounts[] = {3121168263L,130494271L,2190585744L,2227028862L,752817655,1728743684,549338736,1345040852};
+    long accounts[] = {1142592968L,97753385,178394616,224340125,78265278,1728743684,549338736,1345040852};
     SharedPreferences sharedPreferences;
 
     @Override
@@ -94,7 +94,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
 //////
-        String[] planets = res.getStringArray(R.array.hashtag_list_T_uyar);
+        String[] planets = res.getStringArray(R.array.ingilizce_hashtag_list);
 
         random = new Random();
 ////
@@ -123,8 +123,8 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
         int length = accounts.length;
-        int i = random.nextInt(length);
-        new GetFollowersTask().execute(accounts[i]);
+        int randomacconut = random.nextInt(length);
+        new GetFollowersTask().execute(accounts[randomacconut]);
 
         //burak bu kısım string.xml den çekmek için
 
@@ -143,6 +143,38 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 //        new GetLocaion().execute();
 
+
+
+
+
+        ArrayList<String> strings = Utils.txtToArray(context);
+
+        ydsWords = new ArrayList<>();
+        for (int i = 0; i < strings.size() / 4; i++) {
+
+            YdsWord ydsWord = new YdsWord(0, strings.get(i * 4), strings.get(i * 4 + 1), strings.get(i * 4 + 2), strings.get(i * 4 + 3), 0);
+            ydsWords.add(ydsWord);
+        }
+
+
+
+
+
+
+
+        int j = random.nextInt(ydsWords.size());
+
+
+        YdsWord currentWord = ydsWords.get(j);
+
+        String shareBody = "#Yds Kelime: " + currentWord.getWord() +
+                "\nAnlamı : " + currentWord.getTranslatedWord() + "\nBenzer kelime: " + currentWord.getSimilarWord() + "\n" + context.getString(R.string.app_link);
+
+
+
+
+
+                new MentionReq().execute(shareBody);
 
     }
 

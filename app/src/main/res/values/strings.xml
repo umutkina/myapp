@@ -109,6 +109,14 @@
         <!--<item>#takipedenitakipederim</item>-->
         <!--<item>#takipedenitakipederimm</item>-->
     <!--</string-array>-->
+
+    <string-array name="ingilizce_hashtag_list">
+        <item>#YDS #Kelime </item>
+        <item>#YDS #ingilizce </item>
+        <item>#ingilizce #Kelime </item>
+        <item>#ezber #Kelime </item>
+        <item>#ingilizce </item>
+    </string-array>
     <string-array name="hashtag_list">
         <!--<item>kemal sayar</item>-->
 
