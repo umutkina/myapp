@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Handler;
 
-import com.umutkina.findunfollowersapp.R;
 import com.umutkina.findunfollowersapp.UnfApplication;
 import com.umutkina.findunfollowersapp.modals.Const;
+import com.umutkina.findunfollowersapp.modals.HashTag;
+import com.umutkina.findunfollowersapp.modals.HashTagListWraper;
 import com.umutkina.findunfollowersapp.modals.TweetItem;
 import com.umutkina.findunfollowersapp.modals.TweetList;
 import com.umutkina.findunfollowersapp.modals.TweetListWrapper;
@@ -19,14 +19,12 @@ import com.umutkina.findunfollowersapp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import twitter4j.IDs;
 import twitter4j.Query;
 import twitter4j.QueryResult;
-import twitter4j.Trends;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
@@ -43,7 +41,12 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     int woeId = 23424969;
     Context context;
     ArrayList<YdsWord> ydsWords;
-    Random random;
+
+
+    int  currentTweetPosition;
+    int  currentHashTagPosition;
+    int  currentAccountPosition;
+
 //    HashTagListWraper hashTagListWraper;
     //    int sabahattinaliId=752817655;
 //    long sabahattinaliId = 2227028862L;
@@ -73,11 +76,13 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         final UnfApplication application = (UnfApplication) context.getApplicationContext();
         twitters = application.getTwitters();
         sharedPreferences = application.getmSharedPreferences();
-        Resources res = context.getResources();
 
-        String hashTagJson = sharedPreferences.getString(Const.HASH_TAG_LIST, null);
+       currentTweetPosition= sharedPreferences.getInt(Const.TwEET_POSITION,0);
+        currentAccountPosition= sharedPreferences.getInt(Const.ACCOUNT_POSITION,0);
+        currentHashTagPosition= sharedPreferences.getInt(Const.HASHTAG_POSITION,0);
 
-//        hashTagListWraper = (HashTagListWraper) Utils.getObject(string, HashTagListWraper.class);
+
+
 
 //        if (hashTagListWraper != null) {
 //            Resources res = context.getResources();
@@ -94,17 +99,17 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
 //////
-        String[] planets = res.getStringArray(R.array.hashtag_list_T_uyar);
 
-        random = new Random();
+
+
 ////
         // turguy uyar account
 
 ////
 //
-        int k = random.nextInt(planets.length);
-        Query currentQuery = new Query(planets[k]);
-        search(currentQuery);
+
+
+        search();
 
 
 
@@ -122,9 +127,9 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
 
-        int length = accounts.length;
-        int i = random.nextInt(length);
-        new GetFollowersTask().execute(accounts[i]);
+
+
+        new GetFollowersTask().execute();
 
         //burak bu kısım string.xml den çekmek için
 
@@ -146,62 +151,6 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
     }
 
-    class MentionReqForRandomTweet extends AsyncTask<String, String, String> {
-
-        /**
-         * Before starting background thread Show Progress Dialog
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        /**
-         * getting Places JSON
-         */
-        protected String doInBackground(String... args) {
-
-            String user = "";
-            try {
-
-                for (Twitter twitter : twitters) {
-                    Resources res = context.getResources();
-
-                    String[] planets = res.getStringArray(R.array.sentence_list);
-                    Random random = new Random();
-
-                    int randonSentence = random.nextInt(planets.length);
-
-                    twitter.updateStatus(planets[randonSentence]);
-                    Thread.sleep(1000);
-                }
-
-
-            } catch (TwitterException e) {
-                e.printStackTrace();
-                user = null;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return user;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog and show
-         * the data in UI Always use runOnUiThread(new Runnable()) to update UI
-         * from background thread, otherwise you will get error
-         * *
-         */
-        protected void onPostExecute(String user) {
-            // dismiss the dialog after getting all products
-
-
-            // updating UI from Background Thread
-        }
-
-    }
-
     class MentionReq extends AsyncTask<String, String, String> {
 
         /**
@@ -220,7 +169,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
             String user = "";
             try {
-
+                int i=0;
                 for (Twitter twitter : twitters) {
                     String string = sharedPreferences.getString(Const.TWEET_LIST, null);
 
@@ -240,11 +189,14 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
                     ArrayList<TweetItem> tweetItems = currentTwetList.getTweetItems();
-                    int randonSentence = random.nextInt(tweetItems.size());
-                    String tweet = tweetItems.get(randonSentence).getTweet();
+                    int tweetPosition = currentTweetPositionByAccount(i, tweetItems.size());
+                    String tweet = tweetItems.get(tweetPosition).getTweet();
                     twitter.updateStatus(tweet);
                     Thread.sleep(1000);
+                    i++;
                 }
+
+                currentTweetPosition++;
 
 
             } catch (TwitterException e) {
@@ -271,143 +223,21 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
     }
 
-    class GetLocaion extends AsyncTask<Void, Trends, Trends> {
 
-
-        /**
-         * Before starting background thread Show Progress Dialog
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-
-        }
-
-        /**
-         * getting Places JSON
-         */
-        @Override
-        protected Trends doInBackground(Void... params) {
-            Trends locations = null;
-            try {
-
-//                followersList = twitter.getFollowersList(args[0], args[1]);
-
-//                Long[] ids = new Long[args[0].size()];
-//                ids=args[0].toArray(ids);
-
-
-                for (Twitter twitter : twitters) {
-                    locations = twitter.getPlaceTrends(woeId);
-
-                    Thread.sleep(1000);
-                }
-
-            } catch (Exception e1) {
-                e1.printStackTrace();
-//                finish();
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(MakeHashTagTweetActivity.this, R.string.shoult_login, Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                });
-
-            }
-            return locations;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog and show
-         * the data in UI Always use runOnUiThread(new Runnable()) to update UI
-         * from background thread, otherwise you will get error
-         * *
-         */
-        protected void onPostExecute(Trends trends) {
-            // dismiss the dialog after getting all products
-            if (trends != null) {
-                final ArrayList<String> hastags = new ArrayList<>();
-                for (int i = 0; i < trends.getTrends().length; i++) {
-                    System.out.println("trends : " + trends.getTrends()[i].getName());
-                    hastags.add(trends.getTrends()[i].getName());
-                }
-
-
-                Collections.shuffle(hastags);
-
-
-                StringBuilder stringBuilder = new StringBuilder();
-
-                ArrayList<String> strings = Utils.txtToArray(context);
-
-                ydsWords = new ArrayList<>();
-                for (int i = 0; i < strings.size() / 4; i++) {
-
-                    YdsWord ydsWord = new YdsWord(0, strings.get(i * 4), strings.get(i * 4 + 1), strings.get(i * 4 + 2), strings.get(i * 4 + 3), 0);
-                    ydsWords.add(ydsWord);
-                }
-                Resources res = context.getResources();
-
-                String[] planets = res.getStringArray(R.array.sentence_list);
-                Random random = new Random();
-
-                int randonSentence = random.nextInt(planets.length);
-
-                new MentionReq().execute(planets[randonSentence]);
-
-
-                int i = random.nextInt(ydsWords.size());
-                stringBuilder.append(ydsWords.get(i));
-
-                YdsWord currentWord = ydsWords.get(i);
-
-                String shareBody = "#Yds Kelime: " + currentWord.getWord() +
-                        "\nAnlamı : " + currentWord.getTranslatedWord() + "\nBenzer kelime: " + currentWord.getSimilarWord() + "\n" + context.getString(R.string.app_link);
-
-                String lastTag = "";
-
-                for (String hastag : hastags) {
-                    lastTag = hastag;
-
-                    stringBuilder.append(" " + hastag);
-
-                    if (stringBuilder.toString().length() > 140) {
-                        break;
-                    }
-                }
-                String s = stringBuilder.toString();
-                String replace = s.replace(lastTag, "");
-
-
-//                new MentionReq().execute(shareBody);
-                new MentionReq().execute(planets[randonSentence]);
-//                new MentionReq().execute(planets[randonSentence]);
-
-//                new MentionReq().execute("Bu tweet'i beğenen/rtleyenler ve hesabı takip edenler birbirini takip ediyor #takipedenitakipederim\n" +
-//                        "#geritakip\n" +
-//                        "#gt\n "+randomnomber);
-
-
-            }
-
-        }
-
-
-    }
 
 
     // updating UI from Background Thread
-    Query currentQuery;
 
 
-    public void search(Query query) {
+
+    public void search() {
+
+
         ;
-        new SearchRequest().execute(query);
+        new SearchRequest().execute();
     }
 
-    class SearchRequest extends AsyncTask<Query, QueryResult, QueryResult> {
+    class SearchRequest extends AsyncTask<Query, ArrayList<QueryResult>, ArrayList<QueryResult>> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -422,27 +252,41 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         /**
          * getting Places JSON
          */
-        protected QueryResult doInBackground(Query... args) {
-            QueryResult search = null;
+        protected ArrayList<QueryResult> doInBackground(Query... args) {
+            ArrayList<QueryResult>  queries=new ArrayList<>();
+
+
             try {
 
 //                followersList = twitter.getFollowersList(args[0], args[1]);
 
 //                Long[] ids = new Long[args[0].size()];
 //                ids=args[0].toArray(ids);
+                String hashTagJson = sharedPreferences.getString(Const.HASH_TAG_LIST, null);
 
+                HashTagListWraper hashTagListWraper = (HashTagListWraper) Utils.getObject(hashTagJson, HashTagListWraper.class);
+                ArrayList<HashTag> hashTagArrayList = hashTagListWraper.getHashTagArrayList();
+                int i=0;
                 for (Twitter twitter : twitters) {
 
-                    search = twitter.search(args[0]);
+                    Query currentQuery = new Query(hashTagArrayList.get(currentHashTagOrAaccountPositionByAccount(i,currentHashTagPosition,hashTagArrayList.size())).getHashTag());
+                    QueryResult search = twitter.search(currentQuery);
+                    queries.add(search);
                     Thread.sleep(1000);
+
+                    i++;
                 }
+
+                // beynimin sadakasını nasıl vereceğim ?
+
+                currentHashTagPosition++;
 
             } catch (TwitterException e1) {
                 e1.printStackTrace();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return search;
+            return queries;
         }
 
         /**
@@ -451,30 +295,32 @@ public class TweetServiceReceiver extends BroadcastReceiver {
          * from background thread, otherwise you will get error
          * *
          */
-        protected void onPostExecute(QueryResult result) {
+        protected void onPostExecute(ArrayList<QueryResult> result) {
             // dismiss the dialog after getting all products
+            for (QueryResult queryResult : result) {
+                List<twitter4j.Status> tweets = queryResult.getTweets();
+//            currentQuery = result.nextQuery();
+                for (final twitter4j.Status l : tweets) {
+                    final User user = l.getUser();
+                    Random random = new Random();
+                    int i = random.nextInt(10000);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
 
-            List<twitter4j.Status> tweets = result.getTweets();
-            currentQuery = result.nextQuery();
-            for (final twitter4j.Status l : tweets) {
-                final User user = l.getUser();
-                Random random = new Random();
-                int i = random.nextInt(10000);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+                            // tweet follow kısmı
+                            new RequestTask().execute(l.getId());
 
-                        // tweet follow kısmı
-                        new RequestTask().execute(l.getId());
+                            // tweeti atan kişiyi takip ediyor.
+                            new RequestTaskFollow().execute(user.getId());
 
-                        // tweeti atan kişiyi takip ediyor.
-                        new RequestTaskFollow().execute(user.getId());
-
-                    }
-                }, i);
+                        }
+                    }, i);
 
 
+                }
             }
+
 
             // updating UI from Background Thread
         }
@@ -533,7 +379,11 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         }
     }
 
-    class GetFollowersTask extends AsyncTask<Long, IDs, IDs> {
+
+
+
+
+    class GetFollowersTask extends AsyncTask<Long, ArrayList <IDs> , ArrayList <IDs>> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -547,18 +397,28 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         /**
          * getting Places JSON
          */
-        protected IDs doInBackground(Long... args) {
-            IDs followersList = null;
+        protected ArrayList <IDs> doInBackground(Long... args) {
+            ArrayList <IDs> iDses=new ArrayList<>();
+
             try {
 
 //                followersList = twitter.getFollowersList(args[0], args[1]);
 
-                followersList = twitters.get(0).getFollowersIDs(args[0], -1);
+
+                for (int i = 0; i < twitters.size(); i++) {
+                    long account = accounts[currentHashTagOrAaccountPositionByAccount(i, currentAccountPosition, accounts.length)];
+
+                    IDs followersList= twitters.get(i).getFollowersIDs(account, -1);
+                    iDses.add(followersList);
+                }
+
 
             } catch (TwitterException e1) {
                 e1.printStackTrace();
             }
-            return followersList;
+
+            currentAccountPosition++;
+            return iDses;
         }
 
         /**
@@ -567,36 +427,84 @@ public class TweetServiceReceiver extends BroadcastReceiver {
          * from background thread, otherwise you will get error
          * *
          */
-        protected void onPostExecute(IDs iDs) {
+        protected void onPostExecute(ArrayList <IDs> iDses) {
             // dismiss the dialog after getting all products
 
-            if (iDs == null) {
+            if (iDses == null||iDses.size()<1) {
                 return;
 
             } else {
-                long[] iDs1 = iDs.getIDs();
 
-                for (int i = 0; i < 20; i++) {
-                    final long l = iDs1[i];
-                    Random random = new Random();
-                    int randomInt = random.nextInt(10000);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
+                for (IDs iDs : iDses) {
+                    long[] iDs1 = iDs.getIDs();
+
+                    for (int i = 0; i < 20; i++) {
+                        final long l = iDs1[i];
+                        Random random = new Random();
+                        int randomInt = random.nextInt(10000);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
 
 //                            new RequestTask().execute(l);
-                            new RequestTaskFollow().execute(l);
+                                new RequestTaskFollow().execute(l);
 
-                        }
-                    }, randomInt);
+                            }
+                        }, randomInt);
 
+                    }
                 }
+
 
 
             }
 
 
         }
+
+    }
+
+
+    public  int currentTweetPositionByAccount(int i,int arrayMaxSize){
+
+        int position = 0;
+        final int tweetInterval=28;
+
+
+        position=currentAccountPosition+i*tweetInterval;
+
+
+        if (position>arrayMaxSize) {
+
+            position=position%arrayMaxSize;
+        }
+
+
+        return  position;
+
+
+
+    }
+
+
+    public  int currentHashTagOrAaccountPositionByAccount(int i,int currentHashTagOrAccountPosition,int arrayMaxSize){
+
+        int position = 0;
+        final int tweetInterval=1;
+
+
+        position=currentHashTagOrAccountPosition+i*tweetInterval;
+
+
+        if (position>arrayMaxSize) {
+
+            position=position%arrayMaxSize;
+        }
+
+
+        return  position;
+
+
 
     }
 

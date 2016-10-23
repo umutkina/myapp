@@ -25,21 +25,23 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.umutkina.findunfollowersapp.modals.Const;
 import com.umutkina.findunfollowersapp.modals.ModelUser;
+import com.umutkina.findunfollowersapp.modals.TweetItem;
+import com.umutkina.findunfollowersapp.modals.TweetList;
+import com.umutkina.findunfollowersapp.modals.TweetListWrapper;
 import com.umutkina.findunfollowersapp.modals.UserWrapper;
 import com.umutkina.findunfollowersapp.utils.RoundedImageView;
 import com.umutkina.findunfollowersapp.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
@@ -74,7 +76,9 @@ public class VenueDetailForPunchActivity extends BaseActivity {
     AdView adView;
     @InjectView(R.id.ll_button)
     LinearLayout llButton;
-    ArrayList <Twitter> twitters;
+    ArrayList<Twitter> twitters;
+    @InjectView(R.id.tv_suffle)
+    TextView tvSuffle;
 
     // Shared Preferences
     private SharedPreferences mSharedPreferences;
@@ -121,9 +125,15 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             }
         });
 
+        tvSuffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                suffleArray();
+            }
+        });
+
 
     }
-
 
 
     public boolean isNetworkAvailable() {
@@ -172,7 +182,7 @@ public class VenueDetailForPunchActivity extends BaseActivity {
     private void refreshScreen() {
         unfApplication.changeConfig();
 
-        twitters=unfApplication.getTwitters();
+        twitters = unfApplication.getTwitters();
         UserWrapper userWrapperFromPrefs = Utils.getUserWrapperFromPrefs(this);
 
         if (userWrapperFromPrefs == null) {
@@ -283,7 +293,7 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             cookieManager.removeSessionCookie();
             twitter = unfApplication.getInstance();
             requestToken = twitter
-                    .getOAuthRequestToken(Const.CALLBACK_URL_PUNCH );
+                    .getOAuthRequestToken(Const.CALLBACK_URL_PUNCH);
         } catch (TwitterException e) {
             e.printStackTrace();
         }
@@ -372,7 +382,7 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             try {
                 // Get the access token
 
-                accessToken =twitter.getOAuthAccessToken(requestToken,
+                accessToken = twitter.getOAuthAccessToken(requestToken,
                         verifier);
 
                 // Displaying in xml ui
@@ -554,10 +564,37 @@ public class VenueDetailForPunchActivity extends BaseActivity {
 
     }
 
+    public void suffleArray() {
+
+        String string = mSharedPreferences.getString(Const.TWEET_LIST, null);
+
+        TweetListWrapper tweetListWrapper = (TweetListWrapper) Utils.getObject(string, TweetListWrapper.class);
+        if (tweetListWrapper == null) {
+            return;
+        }
+        String name = mSharedPreferences.getString(Const.SELECTED_TWEET_NAME, null);
+        ArrayList<TweetList> tweetLists = tweetListWrapper.getTweetLists();
+
+
+        for (TweetList tweetList : tweetLists) {
+            if (tweetList.getName().equalsIgnoreCase(name)) {
+                ArrayList<TweetItem> tweetItems = tweetList.getTweetItems();
+                Collections.shuffle(tweetItems);
+                tweetList.setTweetItems(tweetItems);
+            }
+        }
+
+        String json = Utils.getJson(tweetListWrapper);
+
+        mSharedPreferences.edit().putString(Const.TWEET_LIST, json).commit();
+
+
+    }
+
     private boolean isTwitterLoggedInAlready() {
 
         UserWrapper userWrapperFromPrefs = Utils.getUserWrapperFromPrefs(this);
-        return userWrapperFromPrefs!=null;
+        return userWrapperFromPrefs != null;
     }
 
     AdListener adListener2 = new AdListener() {

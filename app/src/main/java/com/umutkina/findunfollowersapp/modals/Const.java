@@ -24,4 +24,9 @@ public class Const {
     public static final String TWITTER_USER_LIST = "twitterUserList";
 
 
+    public static final String TwEET_POSITION = "tweetPosition";
+    public static final String HASHTAG_POSITION = "hashtagPosition";
+    public static final String ACCOUNT_POSITION = "tweetPosition";
+
+
 }
