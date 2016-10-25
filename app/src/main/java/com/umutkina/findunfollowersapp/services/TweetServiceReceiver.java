@@ -123,13 +123,19 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 //            Random random = new Random();
 
-        new MentionReq().execute();
+        boolean accountFollowStatus = sharedPreferences.getBoolean(Const.ACCOUNT_FOLLOW_STATUS, true);
+        boolean autoTweetStatus = sharedPreferences.getBoolean(Const.AUTO_TWEEET_STATUS, true);
 
 
+        if (autoTweetStatus) {
+            new MentionReq().execute();
+        }
 
 
+        if (accountFollowStatus) {
+            new GetFollowersTask().execute();
+        }
 
-        new GetFollowersTask().execute();
 
         //burak bu kısım string.xml den çekmek için
 
@@ -309,10 +315,21 @@ public class TweetServiceReceiver extends BroadcastReceiver {
                         public void run() {
 
                             // tweet follow kısmı
-                            new RequestTask().execute(l.getId());
+
+                            boolean hashtagFavStatus = sharedPreferences.getBoolean(Const.HASHTAG_FAV_STATUS, true);
+                            boolean hashtagFollowStatus = sharedPreferences.getBoolean(Const.HASH_TAG_FOLLOW_STATUS, true);
+
+                            if (hashtagFavStatus) {
+                                new RequestTask().execute(l.getId());
+                            }
+
+                            if (hashtagFollowStatus) {
+                                new RequestTaskFollow().execute(user.getId());
+
+                            }
 
                             // tweeti atan kişiyi takip ediyor.
-                            new RequestTaskFollow().execute(user.getId());
+
 
                         }
                     }, i);

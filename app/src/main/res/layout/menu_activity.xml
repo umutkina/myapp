@@ -134,6 +134,26 @@
                     android:text="Suffle" />
 
 
+                <TextView
+                    android:id="@+id/tv_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/white_rounded_corner_with_stroke"
+                    android:padding="8dp"
+                    android:text="settings" />
+                <TextView
+                    android:id="@+id/tv_users"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/white_rounded_corner_with_stroke"
+                    android:padding="8dp"
+                    android:text="Users" />
             </LinearLayout>
 
             <!--<TextView-->

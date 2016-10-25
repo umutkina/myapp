@@ -26,7 +26,17 @@ public class Const {
 
     public static final String TwEET_POSITION = "tweetPosition";
     public static final String HASHTAG_POSITION = "hashtagPosition";
-    public static final String ACCOUNT_POSITION = "tweetPosition";
+    public static final String ACCOUNT_POSITION = "accountPosition";
+
+
+    public static final String AUTO_TWEEET_STATUS = "autoTweetStatus";
+
+    public static final String HASHTAG_FAV_STATUS = "hashtagFavStatus";
+    public static final String HASH_TAG_FOLLOW_STATUS="hashtagFollowStatus";
+    public static final String ACCOUNT_FOLLOW_STATUS = "accountFollow";
+
+
+
 
 
 }

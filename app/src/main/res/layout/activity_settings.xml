@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.umutkina.findunfollowersapp.SettingsActivity">
+    <TextView
+        android:id="@+id/tv_fav_opened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/white_rounded_corner_with_stroke"
+        android:padding="8dp"
+        android:text="FAV OPENED" />
+    <TextView
+        android:id="@+id/tv_tweet_opened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/white_rounded_corner_with_stroke"
+        android:padding="8dp"
+        android:text="Tweet OPENED" />
+    <TextView
+        android:id="@+id/tv_hashtag_follow_opened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/white_rounded_corner_with_stroke"
+        android:padding="8dp"
+        android:text="HASHTAG FOLLOW OPENED" />
+    <TextView
+        android:id="@+id/tv_account_follow_opened"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/white_rounded_corner_with_stroke"
+        android:padding="8dp"
+        android:text="Account FOLLOW OPENED" />
+</LinearLayout>

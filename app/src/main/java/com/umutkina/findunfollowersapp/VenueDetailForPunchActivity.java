@@ -79,6 +79,10 @@ public class VenueDetailForPunchActivity extends BaseActivity {
     ArrayList<Twitter> twitters;
     @InjectView(R.id.tv_suffle)
     TextView tvSuffle;
+    @InjectView(R.id.tv_settings)
+    TextView tvSettings;
+    @InjectView(R.id.tv_users)
+    TextView tvUsers;
 
     // Shared Preferences
     private SharedPreferences mSharedPreferences;
@@ -129,6 +133,28 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 suffleArray();
+                Toast.makeText(VenueDetailForPunchActivity.this, "suffle tweet list", Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+        tvUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(getContext(),UsersActivity.class));
+
+
+            }
+        });
+
+        tvSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(getContext(),SettingsActivity.class));
+
+
             }
         });
 

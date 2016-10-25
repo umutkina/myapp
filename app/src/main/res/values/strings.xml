@@ -83,31 +83,30 @@
         <item>Attila İlhan</item>
 
 
-        </string-array>
-
+    </string-array>
 
 
     <!--<string-array name="takip_hash_tag">-->
 
-        <!--<item>#takibetakip</item>-->
-        <!--<item>#gt</item>-->
-        <!--<item>#fb</item>-->
-        <!--<item>#tfb</item>-->
-        <!--<item>#teamfollowback</item>-->
-        <!--<item>#takipedentakipedilir</item>-->
-        <!--<item>#F4F</item>-->
-        <!--<item>#anındageritakip</item>-->
-        <!--<item>#mgwv</item>-->
-        <!--<item>#followtrick</item>-->
-        <!--<item>#followback</item>-->
-        <!--<item>#likeforfollow</item>-->
-        <!--<item>#rtfb</item>-->
-        <!--<item>follow all who rt</item>-->
+    <!--<item>#takibetakip</item>-->
+    <!--<item>#gt</item>-->
+    <!--<item>#fb</item>-->
+    <!--<item>#tfb</item>-->
+    <!--<item>#teamfollowback</item>-->
+    <!--<item>#takipedentakipedilir</item>-->
+    <!--<item>#F4F</item>-->
+    <!--<item>#anındageritakip</item>-->
+    <!--<item>#mgwv</item>-->
+    <!--<item>#followtrick</item>-->
+    <!--<item>#followback</item>-->
+    <!--<item>#likeforfollow</item>-->
+    <!--<item>#rtfb</item>-->
+    <!--<item>follow all who rt</item>-->
 
-        <!--<item>#geritakip</item>-->
-        <!--<item>#takip</item>-->
-        <!--<item>#takipedenitakipederim</item>-->
-        <!--<item>#takipedenitakipederimm</item>-->
+    <!--<item>#geritakip</item>-->
+    <!--<item>#takip</item>-->
+    <!--<item>#takipedenitakipederim</item>-->
+    <!--<item>#takipedenitakipederimm</item>-->
     <!--</string-array>-->
     <string-array name="hashtag_list">
         <!--<item>kemal sayar</item>-->

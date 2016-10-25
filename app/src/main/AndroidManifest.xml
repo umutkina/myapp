@@ -60,7 +60,6 @@
         <activity
             android:name=".WebViewActivity"
             android:label="web view" />
-
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
@@ -69,8 +68,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-
 
         <receiver
             android:name=".services.TweetServiceReceiver"
@@ -93,7 +90,9 @@
         <activity android:name=".TweetListActivity" />
         <activity android:name=".AddTweetListItemActivity" />
         <activity android:name=".HashTagListActivity" />
-        <activity android:name=".HashTagAddActivity"></activity>
+        <activity android:name=".HashTagAddActivity" />
+        <activity android:name=".UsersActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
