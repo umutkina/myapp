@@ -20,6 +20,7 @@ public class Const {
     public static final String TWEET_LIST = "tweetList";
     public static final String SELECTED_TWEET_NAME = "selectedTweetName";
     public static final String HASH_TAG_LIST = "hashTagList";
+    public static final String ACCOUNT_LIST = "accountList";
 
     public static final String TWITTER_USER_LIST = "twitterUserList";
 

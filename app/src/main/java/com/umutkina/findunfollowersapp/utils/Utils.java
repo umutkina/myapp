@@ -139,7 +139,7 @@ public class Utils {
 
             if (user.getUserId().equalsIgnoreCase(users.get(i).getUserId())) {
                 users.remove(i);
-                return;
+
             }
         }
         userWrapper.setUsers(users);

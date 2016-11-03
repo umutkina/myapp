@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.umutkina.findunfollowersapp.AddTweetListItemActivity">
+
+    <TextView
+        android:id="@+id/tv_tweet_list_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp" />
+
+    <EditText
+
+        android:hint="account name"
+        android:id="@+id/et_account_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:gravity="start"
+        android:maxLength="140"
+        android:padding="8dp" />
+
+    <EditText
+        android:hint="account id"
+
+        android:id="@+id/et_account_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:gravity="start"
+        android:maxLength="140"
+        android:padding="8dp" />
+
+    <TextView
+        android:id="@+id/tv_submit_tweet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/BlueIns"
+        android:padding="16dp"
+        android:text="Ekle"
+        android:textColor="@color/White" />
+
+    <ListView
+        android:id="@+id/lv_tweet_item_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+
+</LinearLayout>

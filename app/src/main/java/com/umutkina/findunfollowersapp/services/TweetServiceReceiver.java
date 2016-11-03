@@ -9,6 +9,8 @@ import android.os.Handler;
 
 import com.umutkina.findunfollowersapp.UnfApplication;
 import com.umutkina.findunfollowersapp.modals.Const;
+import com.umutkina.findunfollowersapp.modals.FenomenAccount;
+import com.umutkina.findunfollowersapp.modals.FenomenAccountsWrapper;
 import com.umutkina.findunfollowersapp.modals.HashTag;
 import com.umutkina.findunfollowersapp.modals.HashTagListWraper;
 import com.umutkina.findunfollowersapp.modals.TweetItem;
@@ -19,6 +21,7 @@ import com.umutkina.findunfollowersapp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -43,9 +46,9 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     ArrayList<YdsWord> ydsWords;
 
 
-    int  currentTweetPosition;
-    int  currentHashTagPosition;
-    int  currentAccountPosition;
+    int currentTweetPosition;
+    int currentHashTagPosition;
+    int currentAccountPosition;
 
 //    HashTagListWraper hashTagListWraper;
     //    int sabahattinaliId=752817655;
@@ -61,7 +64,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
     //kelime deryası,gafebesi,gogeBAKALIM ,SiirSokaktaaa,Sabahattin_Ali_,siirsokakta,AtayOguz_,N_Hikmet_Ran
 
-    long accounts[] = {3121168263L,130494271L,2190585744L,2227028862L,752817655,1728743684,549338736,1345040852};
+    //    long accounts[] = {3121168263L,130494271L,2190585744L,2227028862L,752817655,1728743684,549338736,1345040852};
     SharedPreferences sharedPreferences;
 
     @Override
@@ -77,11 +80,9 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         twitters = application.getTwitters();
         sharedPreferences = application.getmSharedPreferences();
 
-       currentTweetPosition= sharedPreferences.getInt(Const.TwEET_POSITION,0);
-        currentAccountPosition= sharedPreferences.getInt(Const.ACCOUNT_POSITION,0);
-        currentHashTagPosition= sharedPreferences.getInt(Const.HASHTAG_POSITION,0);
-
-
+        currentTweetPosition = sharedPreferences.getInt(Const.TwEET_POSITION, 0);
+        currentAccountPosition = sharedPreferences.getInt(Const.ACCOUNT_POSITION, 0);
+        currentHashTagPosition = sharedPreferences.getInt(Const.HASHTAG_POSITION, 0);
 
 
 //        if (hashTagListWraper != null) {
@@ -101,7 +102,6 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 //////
 
 
-
 ////
         // turguy uyar account
 
@@ -110,7 +110,6 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
 
         search();
-
 
 
         Calendar cal = Calendar.getInstance();
@@ -174,43 +173,51 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         protected String doInBackground(String... args) {
 
             String user = "";
-            try {
-                int i=0;
-                for (Twitter twitter : twitters) {
-                    String string = sharedPreferences.getString(Const.TWEET_LIST, null);
 
-                    TweetListWrapper tweetListWrapper = (TweetListWrapper) Utils.getObject(string, TweetListWrapper.class);
-                    if (tweetListWrapper==null) {
-                        return null;
+            int i = 0;
+
+
+            Iterator<Twitter> iterator = twitters.iterator();
+            while (iterator.hasNext()) {
+
+                Twitter twitter = iterator.next();
+
+                String string = sharedPreferences.getString(Const.TWEET_LIST, null);
+
+                TweetListWrapper tweetListWrapper = (TweetListWrapper) Utils.getObject(string, TweetListWrapper.class);
+                if (tweetListWrapper == null) {
+                    return null;
+                }
+                String name = sharedPreferences.getString(Const.SELECTED_TWEET_NAME, null);
+                ArrayList<TweetList> tweetLists = tweetListWrapper.getTweetLists();
+                TweetList currentTwetList = null;
+                for (TweetList tweetList : tweetLists) {
+                    if (tweetList.getName().equalsIgnoreCase(name)) {
+                        currentTwetList = tweetList;
+                        break;
                     }
-                    String name = sharedPreferences.getString(Const.SELECTED_TWEET_NAME, null);
-                    ArrayList<TweetList> tweetLists = tweetListWrapper.getTweetLists();
-                    TweetList currentTwetList = null;
-                    for (TweetList tweetList : tweetLists) {
-                        if (tweetList.getName().equalsIgnoreCase(name)) {
-                            currentTwetList = tweetList;
-                            break;
-                        }
-                    }
-
-
-                    ArrayList<TweetItem> tweetItems = currentTwetList.getTweetItems();
-                    int tweetPosition = currentTweetPositionByAccount(i, tweetItems.size());
-                    String tweet = tweetItems.get(tweetPosition).getTweet();
-                    twitter.updateStatus(tweet);
-                    Thread.sleep(1000);
-                    i++;
                 }
 
-                currentTweetPosition++;
 
-
-            } catch (TwitterException e) {
-                e.printStackTrace();
-                user = null;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                ArrayList<TweetItem> tweetItems = currentTwetList.getTweetItems();
+                int tweetPosition = currentTweetPositionByAccount(i, tweetItems.size());
+                String tweet = tweetItems.get(tweetPosition).getTweet();
+                try {
+                    twitter.updateStatus(tweet);
+                    Thread.sleep(1000);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                    user = null;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                i++;
             }
+
+
+            currentTweetPosition++;
+            sharedPreferences.edit().putInt(Const.TwEET_POSITION, currentTweetPosition).commit();
+
             return user;
         }
 
@@ -230,10 +237,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     }
 
 
-
-
     // updating UI from Background Thread
-
 
 
     public void search() {
@@ -259,7 +263,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
          * getting Places JSON
          */
         protected ArrayList<QueryResult> doInBackground(Query... args) {
-            ArrayList<QueryResult>  queries=new ArrayList<>();
+            ArrayList<QueryResult> queries = new ArrayList<>();
 
 
             try {
@@ -272,10 +276,10 @@ public class TweetServiceReceiver extends BroadcastReceiver {
 
                 HashTagListWraper hashTagListWraper = (HashTagListWraper) Utils.getObject(hashTagJson, HashTagListWraper.class);
                 ArrayList<HashTag> hashTagArrayList = hashTagListWraper.getHashTagArrayList();
-                int i=0;
+                int i = 0;
                 for (Twitter twitter : twitters) {
 
-                    Query currentQuery = new Query(hashTagArrayList.get(currentHashTagOrAaccountPositionByAccount(i,currentHashTagPosition,hashTagArrayList.size())).getHashTag());
+                    Query currentQuery = new Query(hashTagArrayList.get(currentHashTagOrAaccountPositionByAccount(i, currentHashTagPosition, hashTagArrayList.size())).getHashTag());
                     QueryResult search = twitter.search(currentQuery);
                     queries.add(search);
                     Thread.sleep(1000);
@@ -286,6 +290,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
                 // beynimin sadakasını nasıl vereceğim ?
 
                 currentHashTagPosition++;
+                sharedPreferences.edit().putInt(Const.HASHTAG_POSITION, currentHashTagPosition);
 
             } catch (TwitterException e1) {
                 e1.printStackTrace();
@@ -349,11 +354,14 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         @Override
         protected String doInBackground(Long... uri) {
             try {
-                for (Twitter twitter : twitters) {
 
-                    twitter.createFavorite(uri[0]);
+                Iterator<Twitter> iterator = twitters.iterator();
+                while (iterator.hasNext()) {
+                    Twitter next = iterator.next();
+                    next.createFavorite(uri[0]);
                     Thread.sleep(1000);
                 }
+
 
             } catch (TwitterException e) {
                 e.printStackTrace();
@@ -375,11 +383,14 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         @Override
         protected String doInBackground(Long... uri) {
             try {
-                for (Twitter twitter : twitters) {
+                Iterator<Twitter> iterator = twitters.iterator();
 
-                    twitter.createFriendship(uri[0]);
+                while (iterator.hasNext()) {
+                    Twitter next = iterator.next();
+                    next.createFriendship(uri[0]);
                     Thread.sleep(1000);
                 }
+
 
             } catch (TwitterException e) {
                 e.printStackTrace();
@@ -397,10 +408,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     }
 
 
-
-
-
-    class GetFollowersTask extends AsyncTask<Long, ArrayList <IDs> , ArrayList <IDs>> {
+    class GetFollowersTask extends AsyncTask<Long, ArrayList<IDs>, ArrayList<IDs>> {
 
         /**
          * Before starting background thread Show Progress Dialog
@@ -414,18 +422,21 @@ public class TweetServiceReceiver extends BroadcastReceiver {
         /**
          * getting Places JSON
          */
-        protected ArrayList <IDs> doInBackground(Long... args) {
-            ArrayList <IDs> iDses=new ArrayList<>();
+        protected ArrayList<IDs> doInBackground(Long... args) {
+            ArrayList<IDs> iDses = new ArrayList<>();
 
             try {
 
 //                followersList = twitter.getFollowersList(args[0], args[1]);
 
 
-                for (int i = 0; i < twitters.size(); i++) {
-                    long account = accounts[currentHashTagOrAaccountPositionByAccount(i, currentAccountPosition, accounts.length)];
+                ArrayList<FenomenAccount> accounts = getAccountList();
 
-                    IDs followersList= twitters.get(i).getFollowersIDs(account, -1);
+                for (int i = 0; i < twitters.size(); i++) {
+                    int index = currentHashTagOrAaccountPositionByAccount(i, currentAccountPosition, accounts.size());
+                    long account = accounts.get(index).getId();
+
+                    IDs followersList = twitters.get(i).getFollowersIDs(account, -1);
                     iDses.add(followersList);
                 }
 
@@ -435,6 +446,7 @@ public class TweetServiceReceiver extends BroadcastReceiver {
             }
 
             currentAccountPosition++;
+            sharedPreferences.edit().putInt(Const.ACCOUNT_POSITION, currentAccountPosition).commit();
             return iDses;
         }
 
@@ -444,10 +456,10 @@ public class TweetServiceReceiver extends BroadcastReceiver {
          * from background thread, otherwise you will get error
          * *
          */
-        protected void onPostExecute(ArrayList <IDs> iDses) {
+        protected void onPostExecute(ArrayList<IDs> iDses) {
             // dismiss the dialog after getting all products
 
-            if (iDses == null||iDses.size()<1) {
+            if (iDses == null || iDses.size() < 1) {
                 return;
 
             } else {
@@ -473,7 +485,6 @@ public class TweetServiceReceiver extends BroadcastReceiver {
                 }
 
 
-
             }
 
 
@@ -482,45 +493,53 @@ public class TweetServiceReceiver extends BroadcastReceiver {
     }
 
 
-    public  int currentTweetPositionByAccount(int i,int arrayMaxSize){
+    public int currentTweetPositionByAccount(int i, int arrayMaxSize) {
 
         int position = 0;
-        final int tweetInterval=28;
+        final int tweetInterval = 28;
 
 
-        position=currentAccountPosition+i*tweetInterval;
+        position = currentTweetPosition + i * tweetInterval;
 
 
-        if (position>arrayMaxSize) {
+        if (position >= arrayMaxSize) {
 
-            position=position%arrayMaxSize;
+            position = position % arrayMaxSize;
         }
 
 
-        return  position;
-
+        return position;
 
 
     }
 
+    public ArrayList<FenomenAccount> getAccountList() {
+        String string = sharedPreferences.getString(Const.ACCOUNT_LIST, null);
+        FenomenAccountsWrapper tweetListWrapper = (FenomenAccountsWrapper) Utils.getObject(string, FenomenAccountsWrapper.class);
+        if (tweetListWrapper != null) {
+            return tweetListWrapper.getFenomenAccounts();
+        }
 
-    public  int currentHashTagOrAaccountPositionByAccount(int i,int currentHashTagOrAccountPosition,int arrayMaxSize){
+        return new ArrayList<>();
+
+    }
+
+    public int currentHashTagOrAaccountPositionByAccount(int i, int currentHashTagOrAccountPosition, int arrayMaxSize) {
 
         int position = 0;
-        final int tweetInterval=1;
+        final int tweetInterval = 1;
 
 
-        position=currentHashTagOrAccountPosition+i*tweetInterval;
+        position = currentHashTagOrAccountPosition + i * tweetInterval;
 
 
-        if (position>arrayMaxSize) {
+        if (position >= arrayMaxSize) {
 
-            position=position%arrayMaxSize;
+            position = position % arrayMaxSize;
         }
 
 
-        return  position;
-
+        return position;
 
 
     }

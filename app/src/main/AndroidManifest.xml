@@ -92,7 +92,8 @@
         <activity android:name=".HashTagListActivity" />
         <activity android:name=".HashTagAddActivity" />
         <activity android:name=".UsersActivity" />
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".AccountAddActivity"></activity>
     </application>
 
 </manifest>

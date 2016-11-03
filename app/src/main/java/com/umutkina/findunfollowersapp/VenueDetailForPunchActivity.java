@@ -83,6 +83,8 @@ public class VenueDetailForPunchActivity extends BaseActivity {
     TextView tvSettings;
     @InjectView(R.id.tv_users)
     TextView tvUsers;
+    @InjectView(R.id.tv_fenomens)
+    TextView tvFenomens;
 
     // Shared Preferences
     private SharedPreferences mSharedPreferences;
@@ -142,7 +144,7 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(getContext(),UsersActivity.class));
+                startActivity(new Intent(getContext(), UsersActivity.class));
 
 
             }
@@ -152,7 +154,17 @@ public class VenueDetailForPunchActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                startActivity(new Intent(getContext(),SettingsActivity.class));
+                startActivity(new Intent(getContext(), SettingsActivity.class));
+
+
+            }
+        });
+
+        tvFenomens.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(getContext(), AccountAddActivity.class));
 
 
             }
@@ -609,7 +621,7 @@ public class VenueDetailForPunchActivity extends BaseActivity {
                 tweetList.setTweetItems(tweetItems);
             }
         }
-
+        tweetListWrapper.setTweetLists(tweetLists);
         String json = Utils.getJson(tweetListWrapper);
 
         mSharedPreferences.edit().putString(Const.TWEET_LIST, json).commit();

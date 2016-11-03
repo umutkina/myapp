@@ -154,6 +154,17 @@
                     android:background="@drawable/white_rounded_corner_with_stroke"
                     android:padding="8dp"
                     android:text="Users" />
+
+                <TextView
+                    android:id="@+id/tv_fenomens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/white_rounded_corner_with_stroke"
+                    android:padding="8dp"
+                    android:text="Fenomens" />
             </LinearLayout>
 
             <!--<TextView-->
